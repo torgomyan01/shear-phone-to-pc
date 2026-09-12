@@ -11,12 +11,18 @@ export const SIGNAL_EVENTS = {
   SIGNAL: "signal",
   CAMERA_SWITCH: "camera:switch",
   CAMERA_FACING: "camera:facing",
+  PHONE_ORIENTATION: "phone:orientation",
+  QUALITY_MODE: "quality:mode",
   SESSION_END: "session:end",
 } as const;
 
 export type Role = "host" | "phone";
 
 export type FacingMode = "user" | "environment";
+
+export type PhoneOrientation = "portrait" | "landscape";
+
+export type QualityMode = "1080p" | "720p";
 
 export interface RoomCreatedPayload {
   roomId: string;
@@ -44,4 +50,12 @@ export type SignalPayload =
 
 export interface CameraFacingPayload {
   facingMode: FacingMode;
+}
+
+export interface PhoneOrientationPayload {
+  orientation: PhoneOrientation;
+}
+
+export interface QualityModePayload {
+  quality: QualityMode;
 }

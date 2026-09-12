@@ -18,7 +18,7 @@ export const HostView = () => {
       return;
     }
 
-    const timer = window.setTimeout(() => setShowChrome(false), 2500);
+    const timer = window.setTimeout(() => setShowChrome(false), 3000);
     return () => window.clearTimeout(timer);
   }, [session.status]);
 
@@ -28,7 +28,15 @@ export const HostView = () => {
       onMouseMove={() => setShowChrome(true)}
       onClick={() => setShowChrome(true)}
     >
-      <VideoStage stream={session.remoteStream} />
+      <VideoStage
+        stream={session.remoteStream}
+        effectiveAspectRatio={session.effectiveAspectRatio}
+        fitMode={session.fitMode}
+        rotation={session.rotation}
+        streamDimensions={session.streamDimensions}
+        onNaturalStreamOrientationChange={session.setNaturalStreamOrientation}
+        onStreamDimensionsChange={session.setStreamDimensions}
+      />
 
       <div
         className={`pointer-events-none absolute inset-0 flex flex-col justify-between p-5 transition-opacity duration-300 ${
@@ -43,6 +51,21 @@ export const HostView = () => {
             <h1 className="mt-2 text-2xl font-medium tracking-tight text-white">
               Phone → PC
             </h1>
+            <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-zinc-400">
+              <span className="font-mono text-zinc-300">
+                {session.effectiveAspectRatio} ({session.fitMode === "contain" ? "Fit" : "Crop"})
+              </span>
+              <span>•</span>
+              <span className="font-mono text-emerald-400">
+                {session.qualityMode === "1080p" ? "1080p" : "720p Fast"}
+              </span>
+              {session.rotation !== 0 ? (
+                <>
+                  <span>•</span>
+                  <span className="text-amber-400">Rotated {session.rotation}°</span>
+                </>
+              ) : null}
+            </div>
           </div>
           {session.status !== "live" ? (
             <div className="pointer-events-auto">
@@ -54,6 +77,19 @@ export const HostView = () => {
         <HostControls
           status={session.status}
           facingMode={session.facingMode}
+          phoneOrientation={session.phoneOrientation}
+          qualityMode={session.qualityMode}
+          aspectRatioMode={session.aspectRatioMode}
+          effectiveAspectRatio={session.effectiveAspectRatio}
+          fitMode={session.fitMode}
+          rotation={session.rotation}
+          streamDimensions={session.streamDimensions}
+          stats={session.stats}
+          onSetQualityMode={session.setQualityMode}
+          onSetAspectRatioMode={session.setAspectRatioMode}
+          onSetFitMode={session.setFitMode}
+          onRotateVideo={session.rotateVideo}
+          onResetRotation={session.resetRotation}
           onSwitchCamera={session.switchCamera}
           onEndSession={session.endSession}
           visible={showChrome}

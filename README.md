@@ -5,10 +5,18 @@ Low-latency live camera bridge: phone browser streams video to a PC browser for 
 ## What it does
 
 - Same Wi‑Fi, one phone → one PC
-- QR join link
+- High quality local WebRTC stream (1080p, up to 8 Mbps bitrate, resolution-first priority)
+- QR join link with automatic local Wi‑Fi IP
 - Video only (no audio)
 - Front / back camera (switched from the PC)
-- 9:16 frame on a black background
+- **Automatic orientation detection**:
+  - Horizontal phone → **21:9 cinematic ultra-wide**
+  - Vertical phone → **9:16 vertical**
+- **PC Controls**:
+  - Format buttons: `Auto`, `21:9`, `9:16`
+  - Software 90° rotation button: `0°`, `90°`, `180°`, `270°`
+  - Switch camera (Back / Front)
+  - Pure black background around the active frame (ideal for projectors)
 
 ## Run
 
@@ -17,9 +25,9 @@ npm install
 npm run dev
 ```
 
-Open the **Local** URL printed in the terminal on the PC.
+Open the **Local** URL printed in the terminal on the PC (`https://localhost:3000`).
 
-Scan the QR with the phone (same Wi‑Fi). On first open, accept the self-signed HTTPS warning so the camera can start.
+Scan the QR code with the phone (must be on the same Wi‑Fi). On first open, accept the self-signed HTTPS warning so the camera can start.
 
 ### Production
 

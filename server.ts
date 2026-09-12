@@ -9,6 +9,10 @@ import selfsigned from "selfsigned";
 import {
   SIGNAL_EVENTS,
   type FacingMode,
+  type PhoneOrientation,
+  type PhoneOrientationPayload,
+  type QualityMode,
+  type QualityModePayload,
   type RoomJoinPayload,
   type SignalPayload,
 } from "./src/lib/signaling";
@@ -18,6 +22,8 @@ interface RoomState {
   hostId: string;
   phoneId: string | null;
   facingMode: FacingMode;
+  orientation: PhoneOrientation;
+  quality: QualityMode;
 }
 
 const dev = process.env.NODE_ENV !== "production";
@@ -109,6 +115,8 @@ void app.prepare().then(async () => {
         hostId: socket.id,
         phoneId: null,
         facingMode: "environment",
+        orientation: "portrait",
+        quality: "1080p",
       });
 
       void socket.join(roomId);
@@ -160,7 +168,39 @@ void app.prepare().then(async () => {
       socket.emit(SIGNAL_EVENTS.CAMERA_FACING, {
         facingMode: room.facingMode,
       });
+      socket.emit(SIGNAL_EVENTS.QUALITY_MODE, {
+        quality: room.quality,
+      });
       socket.to(room.hostId).emit(SIGNAL_EVENTS.PHONE_JOINED);
+      socket.to(room.hostId).emit(SIGNAL_EVENTS.PHONE_ORIENTATION, {
+        orientation: room.orientation,
+      });
+    });
+
+    socket.on(SIGNAL_EVENTS.QUALITY_MODE, (payload: QualityModePayload) => {
+      const found = findRoomBySocket(socket.id);
+      if (!found || found.room.hostId !== socket.id) {
+        return;
+      }
+
+      found.room.quality = payload.quality;
+      rooms.set(found.roomId, found.room);
+
+      if (found.room.phoneId) {
+        io.to(found.room.phoneId).emit(SIGNAL_EVENTS.QUALITY_MODE, payload);
+      }
+    });
+
+    socket.on(SIGNAL_EVENTS.PHONE_ORIENTATION, (payload: PhoneOrientationPayload) => {
+      const found = findRoomBySocket(socket.id);
+      if (!found || found.room.phoneId !== socket.id) {
+        return;
+      }
+
+      found.room.orientation = payload.orientation;
+      rooms.set(found.roomId, found.room);
+
+      io.to(found.room.hostId).emit(SIGNAL_EVENTS.PHONE_ORIENTATION, payload);
     });
 
     socket.on(SIGNAL_EVENTS.HOST_READY, () => {
